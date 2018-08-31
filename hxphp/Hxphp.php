@@ -64,5 +64,21 @@ class Hxphp{
         if(!method_exists($controller, $actionName)){
             exit($controller.'\\'.$actionName."方法不存在");
         }
+
+        $dispatch = new $controller($controllerName, $actionName);
+        // 也可以像方法中传入参数，以下等同于：$dispatch->$actionName($param)
+        call_user_func_array(array($dispatch, $actionName), $param);
+    }
+
+    //检测开发环境
+    public function setReporting()
+    {
+        if(APP_DEBUG === true){
+            error_reporting(E_ALL);
+            ini_set('display_errors', 'On');
+        }else{
+            ini_set('display_errors', 'Off');
+            ini_set('log_errors', 'On');
+        }
     }
 }
