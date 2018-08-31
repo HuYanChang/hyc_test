@@ -28,6 +28,11 @@ class Hxphp{
     public function run()
     {
         spl_autoload_register(array($this, 'loadClass'));
+        $this->setReporting(); //检测app_debug
+        $this->removeMagicQuotes(); //过滤非法字符
+        $this->unregisterGlobals();//禁止注册全局变量
+        $this->setDbConfig();  //数据库配置
+        $this->route(); //路由分发
     }
     //路由处理
     public function route()
@@ -80,5 +85,80 @@ class Hxphp{
             ini_set('display_errors', 'Off');
             ini_set('log_errors', 'On');
         }
+    }
+
+    // 删除敏感字符
+    public function stripSlashesDeep($value)
+    {
+        $value = is_array($value) ? array_map(array($this, 'stripSlashesDeep'), $value) : stripslashes($value);
+        return $value;
+    }
+
+    // 检测敏感字符并删除
+    public function removeMagicQuotes()
+    {
+        if (get_magic_quotes_gpc()) {
+            $_GET = isset($_GET) ? $this->stripSlashesDeep($_GET ) : '';
+            $_POST = isset($_POST) ? $this->stripSlashesDeep($_POST ) : '';
+            $_COOKIE = isset($_COOKIE) ? $this->stripSlashesDeep($_COOKIE) : '';
+            $_SESSION = isset($_SESSION) ? $this->stripSlashesDeep($_SESSION) : '';
+        }
+    }
+
+    public function unregisterGlobals()
+    {
+        if (ini_get('register_globals')) {
+            $array = array('_SESSION', '_POST', '_GET', '_COOKIE', '_REQUEST', '_SERVER', '_ENV', '_FILES');
+            foreach ($array as $value) {
+                foreach ($GLOBALS[$value] as $key => $var) {
+                    if ($var === $GLOBALS[$key]) {
+                        unset($GLOBALS[$key]);
+                    }
+                }
+            }
+        }
+    }
+
+    // 配置数据库信息
+    public function setDbConfig()
+    {
+        if ($this->config['db']) {
+            define('DB_HOST', $this->config['db']['host']);
+            define('DB_NAME', $this->config['db']['dbname']);
+            define('DB_USER', $this->config['db']['username']);
+            define('DB_PASS', $this->config['db']['password']);
+        }
+    }
+
+    //自动加载类
+    public function loadClass($className)
+    {
+        $classMap = $this->classMap();
+
+        if(isset($classMap[$className])){
+            //包含内核文件
+            $file = $classMap[$className];
+        }elseif(strpos($className, '\\') !== false){
+            //包含app目录文件
+            $file = APP_PATH . str_replace('\\', '/', $className). '.php';
+            if(!is_file($file)){
+                return ;
+            }
+        }else{
+            return ;
+        }
+        include  $file;
+    }
+
+    // 内核文件命名空间映射关系
+    protected function classMap()
+    {
+        return [
+            'hxphp\base\Controller' => CORE_PATH . '/base/Controller.php',
+            'hxphp\base\Model' => CORE_PATH . '/base/Model.php',
+            'hxphp\base\View' => CORE_PATH . '/base/View.php',
+            'hxphp\db\Db' => CORE_PATH . '/db/Db.php',
+            'hxphp\db\Sql' => CORE_PATH . '/db/Sql.php',
+        ];
     }
 }
