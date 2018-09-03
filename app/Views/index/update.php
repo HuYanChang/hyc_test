@@ -1,0 +1,1 @@
+<a class="big" href="/index">成功修改<?php echo $count?>条，点击返回</a>
