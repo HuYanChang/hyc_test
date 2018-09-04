@@ -47,7 +47,7 @@ class Sql{
     public function fetchAll()
     {
        $sql = sprintf("select * from `%s` %s", $this->table, $this->filter);
-       $sth = Db::pdo()->perpare($sql);
+       $sth = Db::pdo()->prepare($sql);
        $sth = $this->formatParam($sth, $this->param);
        $sth->execute();
 

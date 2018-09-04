@@ -5,7 +5,7 @@
  * Date: 2018/9/3
  * Time: 15:55
  */
-namespace  app\controllers;
+namespace  app\Controllers;
 
 use hxphp\base\Controller;
 use app\models\IndexModel;

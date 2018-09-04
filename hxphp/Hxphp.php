@@ -9,7 +9,7 @@
 namespace hxphp;
 
 //框架根目录
-define('CORE_PATH') or define('CORE_PATH', __DIR__);
+define('CORE_PATH', __DIR__);
 
 /**
  * Class Hxphp
@@ -62,7 +62,7 @@ class Hxphp{
             $param = $urlArray ? $urlArray : array();
         }
         //判断是否存在控制器和方法
-        $controller = 'app\\controllers\\'.$controllerName.'Controller';
+        $controller = 'app\\Controllers\\'.$controllerName.'Controller';
         if(!class_exists($controller)){
             exit($controller."控制器不存在");
         }
@@ -137,10 +137,10 @@ class Hxphp{
 
         if(isset($classMap[$className])){
             //包含内核文件
-            $file = $classMap[$className];
+            $file = str_replace('/', '\\', $classMap[$className]);
         }elseif(strpos($className, '\\') !== false){
             //包含app目录文件
-            $file = APP_PATH . str_replace('\\', '/', $className). '.php';
+            $file = APP_PATH . '\\' . $className. '.php';
             if(!is_file($file)){
                 return ;
             }
