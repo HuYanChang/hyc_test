@@ -3,7 +3,7 @@
     <input type="submit" value="搜索">
 </form>
 
-<p><a href="/manage">新建</a></p>
+<p><a href="/index/manage">新建</a></p>
 
 <table>
     <tr>
@@ -16,8 +16,8 @@
             <td><?php echo $index['id'] ?></td>
             <td><?php echo $index['item_name'] ?></td>
             <td>
-                <a href="/manage/<?php echo $index['id']?>">编辑</a>
-                <a href="/delete/<?php echo $index['id']?>">删除</a>
+                <a href="/index/manage/<?php echo $index['id']?>">编辑</a>
+                <a href="/index/delete/<?php echo $index['id']?>">删除</a>
             </td>
         </tr>
     <?php endforeach ?>
